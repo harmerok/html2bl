@@ -3,7 +3,7 @@ var htmlparser = require("htmlparser2"),
     path = require("path"),
     vow = require('vow'),
     promisify = require('vow-node').promisify,
-    classes = [],
+
     stat = promisify(fs.stat);
 
 /**
@@ -12,6 +12,7 @@ var htmlparser = require("htmlparser2"),
  * @returns {string[]} class names
  */
 function getClasses(html) {
+    var classes = []
     var parser = new htmlparser.Parser({
         onopentag: function(name, attribs){
             if(attribs.class){
@@ -33,7 +34,7 @@ function getClasses(html) {
  * @returns {string[]}
  */
 function getFilesFromBlocks(blocks, levels) {
-    var cssFiles = [],
+    var sassFiles = [],
         blockDirs = [];
 
     return vow.all(levels.map(function(level) {
@@ -42,16 +43,16 @@ function getFilesFromBlocks(blocks, levels) {
             return stat(dirName).then(function (stats) {
                 if (stats.isDirectory()) {
                     blockDirs.push(dirName);
-                    var fileName = path.resolve(dirName + '/' + blockName + '.css');
+                    var fileName = path.resolve(dirName + '/' + blockName + '.sass');
                 }
                 if (fs.statSync(fileName).isFile()) {
-                    cssFiles.push(fileName);
+                    sassFiles.push(fileName);
                 }
                 return stats;
             });
         }));
     })).then(function() {
-        return { css: cssFiles, dirs: blockDirs };
+        return { sass: sassFiles, dirs: blockDirs };
     });
 }
 
@@ -66,6 +67,7 @@ function getFilesFromBlocks(blocks, levels) {
 exports.getFileNames = function(params) {
     var htmlSrc = fs.readFileSync(params.htmlSrc, 'utf8'),
         blocks = getClasses(htmlSrc);
+        console.log(getClasses(htmlSrc))
 
     return getFilesFromBlocks(blocks, params.levels).then(function(files) {
         return files;
