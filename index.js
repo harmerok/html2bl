@@ -1,18 +1,16 @@
-var htmlparser = require("htmlparser2"),
+﻿﻿var htmlparser = require("htmlparser2"),
     fs = require("fs"),
     path = require("path"),
     vow = require('vow'),
     promisify = require('vow-node').promisify,
-
-    stat = promisify(fs.stat);
-
+    stat = promisify(fs.stat),
+    classes = [];
 /**
  * Returns unique CSS class names from html string in source file order.
  * @param {string} html
  * @returns {string[]} class names
  */
 function getClasses(html) {
-    var classes = []
     var parser = new htmlparser.Parser({
         onopentag: function(name, attribs){
             if(attribs.class){
@@ -34,7 +32,7 @@ function getClasses(html) {
  * @returns {string[]}
  */
 function getFilesFromBlocks(blocks, levels) {
-    var sassFiles = [],
+    var cssFiles = [],
         blockDirs = [];
 
     return vow.all(levels.map(function(level) {
@@ -43,16 +41,16 @@ function getFilesFromBlocks(blocks, levels) {
             return stat(dirName).then(function (stats) {
                 if (stats.isDirectory()) {
                     blockDirs.push(dirName);
-                    var fileName = path.resolve(dirName + '/' + blockName + '.sass');
+                    var fileName = path.resolve(dirName + '/' + blockName + '.css');
                 }
                 if (fs.statSync(fileName).isFile()) {
-                    sassFiles.push(fileName);
+                    cssFiles.push(fileName);
                 }
                 return stats;
             });
         }));
     })).then(function() {
-        return { sass: sassFiles, dirs: blockDirs };
+        return { css: cssFiles, dirs: blockDirs };
     });
 }
 
@@ -65,11 +63,11 @@ function getFilesFromBlocks(blocks, levels) {
  *
  */
 exports.getFileNames = function(params) {
+	classes = [];
     var htmlSrc = fs.readFileSync(params.htmlSrc, 'utf8'),
         blocks = getClasses(htmlSrc);
-        console.log(getClasses(htmlSrc))
-
     return getFilesFromBlocks(blocks, params.levels).then(function(files) {
         return files;
+
     });
 };
