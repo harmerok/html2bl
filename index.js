@@ -1,4 +1,4 @@
-var htmlparser = require("htmlparser2"),
+﻿﻿var htmlparser = require("htmlparser2"),
     fs = require("fs"),
     path = require("path"),
     vow = require('vow'),
@@ -32,7 +32,7 @@ function getClasses(html) {
  * @returns {string[]}
  */
 function getFilesFromBlocks(blocks, levels) {
-    var sassFiles = [],
+    var cssFiles = [],
         blockDirs = [];
 
     return vow.all(levels.map(function(level) {
@@ -41,16 +41,16 @@ function getFilesFromBlocks(blocks, levels) {
             return stat(dirName).then(function (stats) {
                 if (stats.isDirectory()) {
                     blockDirs.push(dirName);
-                    var fileName = path.resolve(dirName + '/' + blockName + '.sass');
+                    var fileName = path.resolve(dirName + '/' + blockName + '.css');
                 }
                 if (fs.statSync(fileName).isFile()) {
-                    sassFiles.push(fileName);
+                    cssFiles.push(fileName);
                 }
                 return stats;
             });
         }));
     })).then(function() {
-        return { sass: sassFiles, dirs: blockDirs };
+        return { css: cssFiles, dirs: blockDirs };
     });
 }
 
