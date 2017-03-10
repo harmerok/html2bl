@@ -50,7 +50,7 @@ function getFilesFromBlocks(blocks, levels) {
             });
         }));
     })).then(function() {
-        return { styl: cssFiles, dirs: blockDirs };
+        return { styl: stylFiles, dirs: blockDirs };
     });
 }
 
