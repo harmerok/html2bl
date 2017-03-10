@@ -32,7 +32,7 @@ function getClasses(html) {
  * @returns {string[]}
  */
 function getFilesFromBlocks(blocks, levels) {
-    var cssFiles = [],
+    var stylFiles = [],
         blockDirs = [];
 
     return vow.all(levels.map(function(level) {
@@ -41,16 +41,16 @@ function getFilesFromBlocks(blocks, levels) {
             return stat(dirName).then(function (stats) {
                 if (stats.isDirectory()) {
                     blockDirs.push(dirName);
-                    var fileName = path.resolve(dirName + '/' + blockName + '.css');
+                    var fileName = path.resolve(dirName + '/' + blockName + '.styl');
                 }
                 if (fs.statSync(fileName).isFile()) {
-                    cssFiles.push(fileName);
+                    stylFiles.push(fileName);
                 }
                 return stats;
             });
         }));
     })).then(function() {
-        return { css: cssFiles, dirs: blockDirs };
+        return { styl: cssFiles, dirs: blockDirs };
     });
 }
 
